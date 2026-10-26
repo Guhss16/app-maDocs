@@ -149,13 +149,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   item: {
-    width: 55,
+    width: 75,
     alignItems: "center",
     justifyContent: "center",
   },
   button: {
-    width: 75,
-    height: 75,
+    width: 65,
+    height: 65,
     borderRadius: 37.5,
     alignItems: "center",
     justifyContent: "center",

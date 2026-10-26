@@ -1,26 +1,29 @@
-import { Logo } from "@/assets/images/logo";
-import { Menu } from "@/components/menu";
-import { SearchField } from "@/components/search-field";
-
+import { initDatabase } from "@/data/database";
 import "@/global.css";
-import { Text, View } from "react-native";
+import { Stack } from "expo-router";
+import { useEffect, useState } from "react";
 
-export default function TabLayout() {
+export default function RootLayout() {
+  const [dbReady, setDbReady] = useState(false);
+
+  useEffect(() => {
+    initDatabase()
+      .then(() => setDbReady(true))
+      .catch((error) => console.error("Erro ao abrir o banco:", error));
+  }, []);
+
+  if (!dbReady) {
+    return null;
+  }
+
   return (
-    <View className="flex-1 bg-azul-primario">
-      <View className="mt-[40px] mb-[30px] items-center gap-[24px] p-[20px]">
-        <Logo color="white" />
-        <SearchField />
-      </View>
-      <View className="bg-white rounded-t-[20px] h-full p-[20px] flex flex-col gap-[20px]">
-        <View>
-          <Text className="text-start text-2xl text-azul-primario font-normal">
-            Bem-vindo ao <Logo color="#3E5DF9" />
-          </Text>
-          <Text>Acesso rápido de documentos!</Text>
-        </View>
-        <Menu />
-      </View>
-    </View>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: "slide_from_right",
+        animationDuration: 250,
+        gestureEnabled: true,
+      }}
+    />
   );
 }
