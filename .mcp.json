@@ -1,0 +1,16 @@
+{
+    "mcpServers":  {
+                       "Framelink_Figma_MCP":  {
+                                                       "command":  "powershell.exe",
+                                                       "args":  [
+                                                                    "-NoLogo",
+                                                                    "-NoProfile",
+                                                                    "-NonInteractive",
+                                                                    "-ExecutionPolicy",
+                                                                    "Bypass",
+                                                                    "-File",
+                                                                    ".vscode\\scripts\\figma-mcp.ps1"
+                                                                ]
+                                                   }
+                   }
+}
