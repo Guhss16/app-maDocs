@@ -1,5 +1,4 @@
 import { Arrow } from "@/assets/images/arrow";
-import { BackButton } from "@/components/back-button";
 import SecondaryView from "@/components/layout/secondary-view";
 import { CATEGORIES, type CategoryKey } from "@/constants/categories";
 import { createDocument, listDocuments } from "@/data/documents";
@@ -64,11 +63,7 @@ export default function TabLayout() {
   }
 
   return (
-    <SecondaryView>
-      <View className="flex flex-row items-center gap-4">
-        <BackButton />
-        <Text className="text-azul-primario text-xl">Adicionar Documento</Text>
-      </View>
+    <SecondaryView labelControls="Adicionar Documento">
       <View className="flex flex-col gap-8 ">
         <TextInput
           placeholder="Nome do documento*"

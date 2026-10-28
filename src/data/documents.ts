@@ -56,3 +56,23 @@ export async function listDocuments(): Promise<Document[]> {
     "SELECT * FROM documents ORDER BY rowid DESC",
   );
 }
+
+export async function getDocumentById(id: string): Promise<Document | null> {
+  return getDb().getFirstAsync<Document>(
+    "SELECT * FROM documents WHERE id = ?",
+    [id],
+  );
+}
+
+export async function deleteDocumentById(id: string): Promise<void> {
+  const doc = await getDocumentById(id);
+  if (!doc) return;
+
+  await getDb().runAsync("DELETE FROM documents WHERE id = ?", [id]);
+
+  try {
+    await deleteVaultFile(doc.file_path);
+  } catch (error) {
+    console.error("Registro apagado, mas o PDF ficou no disco:", error);
+  }
+}
