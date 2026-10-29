@@ -8,8 +8,8 @@ import {
 import { openPdf, sharePdf } from "@/data/pdfActions";
 
 import * as Clipboard from "expo-clipboard";
-import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 
 export default function DocumentDetails() {
@@ -18,12 +18,28 @@ export default function DocumentDetails() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    getDocumentById(id)
-      .then(setDoc)
-      .catch((error) => console.error("Erro ao buscar documento:", error))
-      .finally(() => setLoading(false));
-  }, [id]);
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      setLoading(true);
+
+      getDocumentById(id)
+        .then((result) => {
+          if (active) setDoc(result);
+        })
+        .catch((error) => {
+          console.error("Erro ao buscar documento:", error);
+          if (active) setDoc(null);
+        })
+        .finally(() => {
+          if (active) setLoading(false);
+        });
+
+      return () => {
+        active = false;
+      };
+    }, [id]),
+  );
 
   // volta o botão para "Copiar" depois de 2 segundos
   useEffect(() => {
@@ -102,42 +118,74 @@ export default function DocumentDetails() {
   }
 
   const category = CATEGORIES[doc.category];
+  const folderId = doc.folder_id;
 
   return (
-    <SecondaryView editavel className="flex flex-col">
+    <SecondaryView editavel doc={doc} className="flex flex-col">
       <View>
-        <Text>Documento:</Text>
+        <Text className="text-md">Documento</Text>
         <Text className="text-4xl font-semibold text-azul-primario uppercase">
           {doc.name}
         </Text>
       </View>
 
-      <View>
-        <Text className="text-sm text-gray-500">Categoria</Text>
-        <Text className="text-base">{category.label}</Text>
+      <View className="flex flex-row gap-4">
+        <View className="flex flex-col gap-2">
+          <Text className="text-md">Categoria</Text>
+          <Text
+            className="self-start text-lg text-white w-fit font-bold px-4 py-1 rounded-full"
+            style={{ backgroundColor: category.color }}
+          >
+            {category.label}
+          </Text>
+        </View>
+        <View className="flex flex-col gap-2">
+          <Text>Pasta</Text>
+          {folderId && doc.folder_name ? (
+            <Pressable
+              accessibilityRole="link"
+              accessibilityLabel={`Abrir pasta ${doc.folder_name}`}
+              onPress={() =>
+                router.push({
+                  pathname: "/folder/[id]",
+                  params: { id: folderId },
+                })
+              }
+              className="self-start rounded-full bg-azul-primario px-4 py-1"
+            >
+              <Text className="text-lg font-semibold text-white">
+                {doc.folder_name}
+              </Text>
+            </Pressable>
+          ) : (
+            <Text className="self-start text-lg font-semibold text-gray-500">
+              Sem pasta
+            </Text>
+          )}
+        </View>
       </View>
 
-      <View className="flex flex-row items-center justify-between gap-4 rounded bg-[#D9D9D9] py-2 px-4 shadow-sm">
-        <View>
-          <Text className="text-sm text-gray-500">Número do Documento</Text>
+      <View className="flex flex-col gap-2">
+        <Text className="text-sm text-gray-500">Número do Documento</Text>
+        <View className="flex flex-row items-center justify-between gap-4 rounded bg-[#D9D9D950] py-4 px-4 shadow-sm">
           <Text className="text-base">
             {doc.document_number || "Não informado"}
           </Text>
+          {doc.document_number && (
+            <Pressable
+              onPress={handleCopy}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={
+                copied ? "Número copiado" : "Copiar número do documento"
+              }
+            >
+              <Text className="text-azul-primario font-semibold">
+                {copied ? "Copiado!" : "Copiar"}
+              </Text>
+            </Pressable>
+          )}
         </View>
-        {doc.document_number && (
-          <Pressable
-            onPress={handleCopy}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel={
-              copied ? "Número copiado" : "Copiar número do documento"
-            }
-          >
-            <Text className="text-azul-primario font-semibold">
-              {copied ? "Copiado!" : "Copiar"}
-            </Text>
-          </Pressable>
-        )}
       </View>
 
       {/*BOTÕES*/}

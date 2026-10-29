@@ -40,7 +40,7 @@ export function DocumentCard({ doc, onPress }: Props) {
       onPress={() => onPress(doc)}
     >
       <View
-        className="w-1.5 self-stretch"
+        className="w-2 self-stretch"
         style={{ backgroundColor: category.color }}
       />
 

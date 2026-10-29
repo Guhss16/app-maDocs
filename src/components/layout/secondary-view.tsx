@@ -6,6 +6,9 @@ export type SecondaryViewProps = {
   children: React.ReactNode;
   labelControls?: string;
   editavel?: boolean;
+  doc?: {
+    id: string;
+  };
   className?: string;
 };
 
@@ -13,6 +16,7 @@ export default function SecondaryView({
   children,
   labelControls,
   editavel = false,
+  doc,
   className,
 }: SecondaryViewProps) {
   return (
@@ -21,9 +25,13 @@ export default function SecondaryView({
         <Logo color="white" />
       </View>
       <View
-        className={`bg-white rounded-t-[20px] h-full p-[20px] flex flex-col gap-[20px] ${className || ""}`}
+        className={`bg-white rounded-t-[20px] flex-1 p-[20px] flex flex-col gap-[20px] ${className || ""}`}
       >
-        <SecondaryControls label={labelControls} editavel={editavel} />
+        <SecondaryControls
+          label={labelControls}
+          editavel={editavel}
+          doc={doc}
+        />
         {children}
       </View>
     </View>

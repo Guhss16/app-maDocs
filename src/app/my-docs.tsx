@@ -1,5 +1,6 @@
 import { DocumentCard } from "@/components/documentCard";
 import SecondaryView from "@/components/layout/secondary-view";
+import { SearchField } from "@/components/search-field";
 import { Document, listDocuments } from "@/data/documents";
 import { openPdf } from "@/data/pdfActions";
 import { useFocusEffect } from "expo-router";
@@ -44,6 +45,7 @@ export default function SavedDocuments() {
 
   return (
     <SecondaryView labelControls="Meus Documentos">
+      <SearchField />
       <FlatList
         data={docs}
         keyExtractor={(doc) => doc.id}

@@ -11,6 +11,8 @@ export type Document = {
   expires_at: string | null;
   file_path: string;
   file_size: number;
+  folder_id: string | null;
+  folder_name?: string | null;
 };
 
 export type NewDocument = {
@@ -19,20 +21,30 @@ export type NewDocument = {
   pdfUri: string;
   documentNumber?: string;
   expiresAt?: string;
+  folderId?: string | null;
 };
 
 export async function createDocument(input: NewDocument) {
   const id = randomUUID();
 
-  // 1º: copia o PDF para a pasta privada do app
+  // 1. Copia o PDF para a pasta privada do app
   const file = await copyPdfToVault(input.pdfUri, id);
 
   try {
-    // 2º: grava os metadados no banco
+    // 2. Grava os metadados no banco
     await getDb().runAsync(
       `INSERT INTO documents
-        (id, name, category, document_number, expires_at, file_path, file_size)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        (
+          id,
+          name,
+          category,
+          document_number,
+          expires_at,
+          file_path,
+          file_size,
+          folder_id
+        )
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         input.name,
@@ -41,6 +53,7 @@ export async function createDocument(input: NewDocument) {
         input.expiresAt ?? null,
         file.filePath,
         file.fileSize,
+        input.folderId ?? null,
       ],
     );
   } catch (error) {
@@ -59,8 +72,47 @@ export async function listDocuments(): Promise<Document[]> {
 
 export async function getDocumentById(id: string): Promise<Document | null> {
   return getDb().getFirstAsync<Document>(
-    "SELECT * FROM documents WHERE id = ?",
+    `SELECT documents.*, folders.name AS folder_name
+     FROM documents
+     LEFT JOIN folders ON folders.id = documents.folder_id
+     WHERE documents.id = ?`,
     [id],
+  );
+}
+
+export async function updateDocumentById(
+  id: string,
+  input: {
+    name: string;
+    category: CategoryKey;
+    documentNumber: string | null;
+    folderId?: string | null;
+  },
+): Promise<void> {
+  if (input.folderId === undefined) {
+    await getDb().runAsync(
+      `UPDATE documents
+       SET name = ?, category = ?, document_number = ?
+       WHERE id = ?`,
+      [input.name, input.category, input.documentNumber, id],
+    );
+    return;
+  }
+
+  await getDb().runAsync(
+    `UPDATE documents
+     SET name = ?,
+         category = ?,
+         document_number = ?,
+         folder_id = ?
+     WHERE id = ?`,
+    [
+      input.name,
+      input.category,
+      input.documentNumber,
+      input.folderId ?? null,
+      id,
+    ],
   );
 }
 
