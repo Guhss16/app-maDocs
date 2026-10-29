@@ -29,6 +29,7 @@ export default function TabLayout() {
         <Menu
           onAddDocumentPress={() => router.push("/add-docs")}
           onArchivePress={() => router.push("/my-docs")}
+          onOpenFolders={() => router.push("/folders")}
         />
       </View>
     </View>
