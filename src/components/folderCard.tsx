@@ -16,9 +16,11 @@ export default function FolderCard({ folder }: Props) {
       onPress={() =>
         router.push({ pathname: "/folder/[id]", params: { id: folder.id } })
       }
-      className="rounded-xl bg-[#D9D9D9] px-4 py-4"
+      className="rounded-xl bg-[#D9D9D940] px-4 py-4 shadow-sm"
     >
-      <Text className="text-base font-semibold">{folder.name}</Text>
+      <Text className="text-base font-semibold text-azul-primario">
+        {folder.name}
+      </Text>
       <Text className="mt-1 text-sm text-gray-600">
         {folder.documentCount}{" "}
         {folder.documentCount === 1 ? "Documento" : "Documentos"}

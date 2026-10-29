@@ -6,7 +6,9 @@ import {
   updateDocumentById,
   type Document,
 } from "@/data/documents";
-import { router, useLocalSearchParams } from "expo-router";
+import { listFolders, type Folder } from "@/data/folder";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback } from "react";
 import { useEffect, useState } from "react";
 import { Alert, Pressable, Text, TextInput, View } from "react-native";
 
@@ -18,7 +20,37 @@ export default function DocumentEdit() {
   const [number, setNumber] = useState("");
   const [category, setCategory] = useState<CategoryKey | null>(null);
   const [categoryListOpen, setCategoryListOpen] = useState(false);
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const [folderId, setFolderId] = useState<string | null>(null);
+  const [folderListOpen, setFolderListOpen] = useState(false);
+  const [loadingFolders, setLoadingFolders] = useState(true);
+  const [folderLoadError, setFolderLoadError] = useState(false);
+  const [folderLoadAttempt, setFolderLoadAttempt] = useState(0);
   const [saving, setSaving] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+
+      setLoadingFolders(true);
+      setFolderLoadError(false);
+      listFolders()
+        .then((result) => {
+          if (active) setFolders(result);
+        })
+        .catch((error) => {
+          console.error("Erro ao listar pastas:", error);
+          if (active) setFolderLoadError(true);
+        })
+        .finally(() => {
+          if (active) setLoadingFolders(false);
+        });
+
+      return () => {
+        active = false;
+      };
+    }, [folderLoadAttempt]),
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -30,6 +62,7 @@ export default function DocumentEdit() {
           setName(result.name);
           setNumber(result.document_number ?? "");
           setCategory(result.category);
+          setFolderId(result.folder_id);
         }
       })
       .catch((error) => console.error("Erro ao buscar documento:", error))
@@ -48,6 +81,7 @@ export default function DocumentEdit() {
         name: name.trim(),
         category,
         documentNumber: number.trim() || null,
+        folderId,
       });
       router.back();
     } catch (error) {
@@ -157,14 +191,112 @@ export default function DocumentEdit() {
           )}
         </View>
 
+        <View className="gap-2">
+          <Text className="pl-2">Pasta</Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ expanded: folderListOpen }}
+            onPress={() => setFolderListOpen((open) => !open)}
+            disabled={loadingFolders || folderLoadError}
+            className="flex-row items-center justify-between rounded-full bg-[#D9D9D9] px-4 py-3 shadow-sm"
+          >
+            <Text
+              className={`text-lg ${
+                folderId ? "text-black" : "text-[#8C8C8C]"
+              }`}
+            >
+              {loadingFolders
+                ? "Carregando pastas..."
+                : folderLoadError
+                  ? "Pastas indisponíveis"
+                  : (folders.find((folder) => folder.id === folderId)?.name ??
+                    "Nenhuma pasta")}
+            </Text>
+            <Arrow
+              color="#8C8C8C"
+              width={16}
+              direction={folderListOpen ? "up" : "down"}
+            />
+          </Pressable>
+          {folderListOpen && !loadingFolders && !folderLoadError && (
+            <View className="overflow-hidden rounded-2xl bg-[#D9D9D9]">
+              <Pressable
+                accessibilityRole="button"
+                accessibilityState={{ selected: folderId === null }}
+                onPress={() => {
+                  setFolderId(null);
+                  setFolderListOpen(false);
+                }}
+                className="flex-row items-center justify-between px-4 py-3 shadow-sm"
+              >
+                <Text className="text-base text-gray-600">Nenhuma pasta</Text>
+                {folderId === null && (
+                  <Text className="font-semibold text-azul-primario">
+                    SELECIONADA
+                  </Text>
+                )}
+              </Pressable>
+              {folders.map((folder) => {
+                const selected = folderId === folder.id;
+
+                return (
+                  <Pressable
+                    key={folder.id}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    onPress={() => {
+                      setFolderId(folder.id);
+                      setFolderListOpen(false);
+                    }}
+                    className="flex-row items-center justify-between px-4 py-3 shadow-sm"
+                  >
+                    <Text className="text-base">{folder.name}</Text>
+                    {selected && (
+                      <Text className="font-semibold text-azul-primario">
+                        SELECIONADA
+                      </Text>
+                    )}
+                  </Pressable>
+                );
+              })}
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => router.push("/folder/createFolder")}
+                className="flex-row items-center px-4 py-3 shadow-sm"
+              >
+                <Text className="text-base font-semibold text-azul-primario">
+                  + Criar pasta
+                </Text>
+              </Pressable>
+              {folders.length === 0 && (
+                <Text className="px-4 py-3 text-gray-500">
+                  Nenhuma pasta criada.
+                </Text>
+              )}
+            </View>
+          )}
+          {folderLoadError && (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setFolderLoadAttempt((attempt) => attempt + 1)}
+            >
+              <Text className="px-4 font-semibold text-azul-primario">
+                Tentar carregar pastas novamente
+              </Text>
+            </Pressable>
+          )}
+        </View>
+
         <Text className="text-sm text-gray-500">
           O arquivo PDF atual será mantido.
         </Text>
 
         <Pressable
           onPress={handleSave}
-          disabled={saving}
-          className="rounded-full bg-azul-primario py-3 shadow-sm"
+          disabled={saving || loadingFolders || folderLoadError}
+          className={`rounded-full bg-azul-primario py-3 shadow-sm ${
+            saving || loadingFolders || folderLoadError ? "opacity-60" : ""
+          }`}
         >
           <Text className="text-white font-bold text-center text-lg">
             {saving ? "Salvando..." : "Salvar alterações"}

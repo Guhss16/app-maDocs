@@ -112,31 +112,27 @@ export default function FolderDetails() {
   function handleDeleteFolder() {
     if (!folder || folder.documentCount > 0) return;
 
-    Alert.alert(
-      "Excluir pasta",
-      `Deseja excluir a pasta "${folder.name}"?`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Excluir",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteFolderById(folder.id);
-              router.back();
-            } catch (error) {
-              console.error("Erro ao excluir pasta:", error);
-              Alert.alert(
-                "Não foi possível excluir",
-                error instanceof Error
-                  ? error.message
-                  : "Verifique se a pasta está vazia.",
-              );
-            }
-          },
+    Alert.alert("Excluir pasta", `Deseja excluir a pasta "${folder.name}"?`, [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Excluir",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await deleteFolderById(folder.id);
+            router.back();
+          } catch (error) {
+            console.error("Erro ao excluir pasta:", error);
+            Alert.alert(
+              "Não foi possível excluir",
+              error instanceof Error
+                ? error.message
+                : "Verifique se a pasta está vazia.",
+            );
+          }
         },
-      ],
-    );
+      },
+    ]);
   }
 
   async function handleOpenDocument(document: Document) {
@@ -256,7 +252,7 @@ export default function FolderDetails() {
       <FlatList
         data={documents}
         keyExtractor={(document) => document.id}
-        style={{ flex: 1 }}
+        style={{ flexGrow: 0, maxHeight: 240 }}
         contentContainerStyle={{ gap: 12, paddingBottom: 16 }}
         renderItem={({ item }) => (
           <DocumentCard doc={item} onPress={handleOpenDocument} />
