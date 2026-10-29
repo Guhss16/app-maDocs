@@ -4,12 +4,18 @@ import { SearchField } from "@/components/search-field";
 import { Document, listDocuments } from "@/data/documents";
 import { openPdf } from "@/data/pdfActions";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Alert, FlatList, Text } from "react-native";
 
 export default function SavedDocuments() {
   const [docs, setDocs] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const filteredDocs = useMemo(() => {
+    const query = search.trim().toLocaleLowerCase();
+
+    return docs.filter((doc) => doc.name.toLocaleLowerCase().startsWith(query));
+  }, [docs, search]);
 
   useFocusEffect(
     useCallback(() => {
@@ -45,10 +51,11 @@ export default function SavedDocuments() {
 
   return (
     <SecondaryView labelControls="Meus Documentos">
-      <SearchField />
+      <SearchField value={search} onChangeText={setSearch} />
       <FlatList
-        data={docs}
+        data={filteredDocs}
         keyExtractor={(doc) => doc.id}
+        contentContainerStyle={{ gap: 12, paddingBottom: 16 }}
         renderItem={({ item }) => (
           <DocumentCard doc={item} onPress={handleOpen} />
         )}

@@ -1,4 +1,4 @@
-import { StyleSheet, TextInput, View, type TextInputProps } from "react-native";
+import { TextInput, View, type TextInputProps } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
 export type SearchFieldProps = Pick<
@@ -13,7 +13,7 @@ export function SearchField({
   value,
 }: SearchFieldProps) {
   return (
-    <View style={styles.container}>
+    <View className="h-[70px] w-full max-w-[380px] self-center">
       <TextInput
         accessibilityLabel="Pesquisar documentos"
         autoCapitalize="none"
@@ -22,14 +22,16 @@ export function SearchField({
         placeholder={placeholder}
         placeholderTextColor="#8C8C8C"
         returnKeyType="search"
-        style={styles.input}
         value={value}
+        className="absolute bottom-[14px] left-2 right-2 top-[6px] rounded-[40px] bg-[#D9D9D9] pl-4 pr-[60px] text-base text-[#8C8C8C] shadow-md"
+        style={{ letterSpacing: -0.64 }}
       />
+
       <View
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
         pointerEvents="none"
-        style={styles.searchIcon}
+        className="absolute right-[14px] top-[2px] h-[50px] w-[42px] items-center justify-center"
       >
         <Svg width={29} height={42} viewBox="0 0 29 42" fill="none">
           <Path
@@ -43,40 +45,3 @@ export function SearchField({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    maxWidth: 380,
-    height: 70,
-    alignSelf: "center",
-  },
-  input: {
-    position: "absolute",
-    top: 6,
-    right: 8,
-    bottom: 14,
-    left: 8,
-    paddingLeft: 16,
-    paddingRight: 60,
-    borderRadius: 40,
-    backgroundColor: "#D9D9D9",
-    color: "#8C8C8C",
-    fontSize: 16,
-    letterSpacing: -0.64,
-    shadowColor: "#000000",
-    shadowOffset: { width: 2, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 5,
-    elevation: 4,
-  },
-  searchIcon: {
-    position: "absolute",
-    top: 2,
-    right: 14,
-    width: 42,
-    height: 50,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
