@@ -128,3 +128,53 @@ export async function deleteDocumentById(id: string): Promise<void> {
     console.error("Registro apagado, mas o PDF ficou no disco:", error);
   }
 }
+
+export async function countDocuments(): Promise<number> {
+  const result = await getDb().getFirstAsync<{ total: number }>(
+    "SELECT COUNT(*) AS total FROM documents",
+  );
+
+  if (!result) {
+    throw new Error("Não foi possível contar os documentos.");
+  }
+
+  return result.total;
+}
+
+export async function getTotalDocumentSize(): Promise<number> {
+  const result = await getDb().getFirstAsync<{ totalBytes: number }>(
+    "SELECT COALESCE(SUM(file_size), 0) AS totalBytes FROM documents",
+  );
+
+  if (!result) {
+    throw new Error("Não foi possível calcular o espaço ocupado.");
+  }
+
+  return result.totalBytes;
+}
+
+export async function deleteAllDocumentsAndFolders(): Promise<void> {
+  const db = getDb();
+  const documents = await listDocuments();
+  let failedFileDeletes = 0;
+
+  for (const document of documents) {
+    try {
+      await deleteVaultFile(document.file_path);
+    } catch (error) {
+      failedFileDeletes++;
+      console.error(`Erro ao apagar o PDF do documento ${document.id}:`, error);
+    }
+  }
+
+  if (failedFileDeletes > 0) {
+    throw new Error(
+      `Não foi possível apagar ${failedFileDeletes} PDF(s). Os documentos e as pastas foram mantidos; tente novamente.`,
+    );
+  }
+
+  await db.withTransactionAsync(async () => {
+    await db.runAsync("DELETE FROM documents");
+    await db.runAsync("DELETE FROM folders");
+  });
+}
