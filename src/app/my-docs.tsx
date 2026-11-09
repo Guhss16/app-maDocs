@@ -50,11 +50,12 @@ export default function SavedDocuments() {
   if (loading) return null;
 
   return (
-    <SecondaryView labelControls="Meus Documentos">
+    <SecondaryView labelControls="Meus Documentos" scrollable={false}>
       <SearchField value={search} onChangeText={setSearch} />
       <FlatList
         data={filteredDocs}
         keyExtractor={(doc) => doc.id}
+        style={{ flex: 1 }}
         contentContainerStyle={{ gap: 12, paddingBottom: 16 }}
         renderItem={({ item }) => (
           <DocumentCard doc={item} onPress={handleOpen} />

@@ -22,9 +22,7 @@ export default function CategoryDocuments() {
 
   const filteredDocs = useMemo(() => {
     const query = search.trim().toLocaleLowerCase();
-    return docs.filter((doc) =>
-      doc.name.toLocaleLowerCase().startsWith(query),
-    );
+    return docs.filter((doc) => doc.name.toLocaleLowerCase().startsWith(query));
   }, [docs, search]);
 
   useFocusEffect(
@@ -80,11 +78,15 @@ export default function CategoryDocuments() {
   }
 
   return (
-    <SecondaryView labelControls={CATEGORIES[selectedCategory].label}>
+    <SecondaryView
+      labelControls={CATEGORIES[selectedCategory].label}
+      scrollable={false}
+    >
       <SearchField value={search} onChangeText={setSearch} />
       <FlatList
         data={filteredDocs}
         keyExtractor={(doc) => doc.id}
+        style={{ flex: 1 }}
         contentContainerStyle={{ gap: 12, paddingBottom: 16 }}
         renderItem={({ item }) => (
           <DocumentCard doc={item} onPress={handleOpen} />

@@ -25,7 +25,10 @@ const Li = ({ children }: { children: ReactNode }) => (
 
 export default function PrivacyPolicy() {
   return (
-    <SecondaryView labelControls="Política de Privacidade">
+    <SecondaryView
+      labelControls="Política de Privacidade"
+      scrollable={false}
+    >
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="gap-3 pb-10">
           <Text className="text-2xl font-semibold text-azul-primario">

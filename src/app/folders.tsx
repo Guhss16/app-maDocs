@@ -35,7 +35,7 @@ export default function Folders() {
   );
 
   return (
-    <SecondaryView labelControls="Minhas Pastas">
+    <SecondaryView labelControls="Minhas Pastas" scrollable={false}>
       <Pressable
         accessibilityRole="button"
         onPress={() => router.push("/folder/createFolder")}

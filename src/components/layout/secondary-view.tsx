@@ -1,5 +1,5 @@
 import { Logo } from "@/assets/images/logo";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import SecondaryControls from "./secondary-controls";
 
 export type SecondaryViewProps = {
@@ -10,6 +10,7 @@ export type SecondaryViewProps = {
     id: string;
   };
   className?: string;
+  scrollable?: boolean;
 };
 
 export default function SecondaryView({
@@ -18,6 +19,7 @@ export default function SecondaryView({
   editavel = false,
   doc,
   className,
+  scrollable = true,
 }: SecondaryViewProps) {
   return (
     <View className="flex-1 bg-azul-primario">
@@ -32,7 +34,18 @@ export default function SecondaryView({
           editavel={editavel}
           doc={doc}
         />
-        {children}
+        {scrollable ? (
+          <ScrollView
+            className="flex-1"
+            contentContainerStyle={{ gap: 20, paddingBottom: 16 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {children}
+          </ScrollView>
+        ) : (
+          <View className="flex-1 gap-5">{children}</View>
+        )}
       </View>
     </View>
   );

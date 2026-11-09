@@ -9,7 +9,7 @@ import { listQuickAccessDocuments, type Document } from "@/data/documents";
 import "@/global.css";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Alert, FlatList, ScrollView, Text, View } from "react-native";
+import { Alert, FlatList, Text, View } from "react-native";
 
 const categories = Object.entries(CATEGORIES).map(([id, category]) => ({
   id,
@@ -50,62 +50,60 @@ export default function TabLayout() {
         <Logo color="white" />
         <SearchField />
       </View>
-      <ScrollView
+      <FlatList
+        data={quickAccessDocs}
+        keyExtractor={(doc) => doc.id}
         className="flex-1 rounded-t-[20px] bg-white"
-        contentContainerStyle={{ padding: 20, gap: 20 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View>
-          <View className="flex flex-row gap-[5px]">
-            <Text className="text-start text-2xl text-azul-primario font-normal">
-              Bem-vindo ao
-            </Text>
-            <Logo color="#3E5DF9" className="pb-2" />
-          </View>
-          <Text className="text-lg italic font-light">
-            Acesso rápido de documentos!
-          </Text>
-        </View>
-        <Menu
-          onAddDocumentPress={() => router.push("/add-docs")}
-          onArchivePress={() => router.push("/my-docs")}
-          onOpenFolders={() => router.push("/folders")}
-          onSettingsPress={() => router.push("/settings")}
-        />
-        <View className="gap-3">
-          <Text className="text-lg font-semibold text-azul-primario">
-            Categorias
-          </Text>
-          <CategoryCarousel categories={categories} />
-        </View>
-        <View className="gap-3">
-          <Text className="text-lg font-semibold text-azul-primario">
-            Acesso Rápido
-          </Text>
-          <FlatList
-            data={quickAccessDocs}
-            keyExtractor={(doc) => doc.id}
-            contentContainerStyle={{ gap: 12, paddingBottom: 8 }}
-            renderItem={({ item }) => (
-              <DocumentCard
-                doc={item}
-                fullWidth
-                onPress={() =>
-                  router.push({
-                    pathname: "/document/[id]",
-                    params: { id: item.id },
-                  })
-                }
-              />
-            )}
-            ListEmptyComponent={
-              <Text className="text-sm text-gray-500">
-                Nenhum documento marcado com acesso rápido.
+        contentContainerStyle={{ padding: 20, paddingBottom: 28 }}
+        ItemSeparatorComponent={() => <View className="h-3" />}
+        ListHeaderComponent={
+          <View className="gap-5 pb-3">
+            <View>
+              <View className="flex flex-row gap-[5px]">
+                <Text className="text-start text-2xl text-azul-primario font-normal">
+                  Bem-vindo ao
+                </Text>
+                <Logo color="#3E5DF9" className="pb-2" />
+              </View>
+              <Text className="text-lg italic font-light">
+                Acesso rápido de documentos!
               </Text>
+            </View>
+            <Menu
+              onAddDocumentPress={() => router.push("/add-docs")}
+              onArchivePress={() => router.push("/my-docs")}
+              onOpenFolders={() => router.push("/folders")}
+              onSettingsPress={() => router.push("/settings")}
+            />
+            <View className="gap-3">
+              <Text className="text-lg font-semibold text-azul-primario">
+                Categorias
+              </Text>
+              <CategoryCarousel categories={categories} />
+            </View>
+            <Text className="text-lg font-semibold text-azul-primario">
+              Acesso Rápido
+            </Text>
+          </View>
+        }
+        renderItem={({ item }) => (
+          <DocumentCard
+            doc={item}
+            fullWidth
+            onPress={() =>
+              router.push({
+                pathname: "/document/[id]",
+                params: { id: item.id },
+              })
             }
           />
-        </View>
-      </ScrollView>
+        )}
+        ListEmptyComponent={
+          <Text className="text-sm text-gray-500">
+            Nenhum documento marcado com acesso rápido.
+          </Text>
+        }
+      />
     </View>
   );
 }

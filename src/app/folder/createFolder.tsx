@@ -85,7 +85,7 @@ export default function CreateFolder() {
   }
 
   return (
-    <SecondaryView labelControls="Criar Pasta">
+    <SecondaryView labelControls="Criar Pasta" scrollable={false}>
       <TextInput
         accessibilityLabel="Nome da pasta"
         placeholder="Nome da pasta*"

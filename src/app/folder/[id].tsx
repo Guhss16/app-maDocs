@@ -174,7 +174,7 @@ export default function FolderDetails() {
   }
 
   return (
-    <SecondaryView labelControls={folder.name}>
+    <SecondaryView labelControls={folder.name} scrollable={false}>
       <View className="gap-2">
         <Pressable
           accessibilityRole="button"
