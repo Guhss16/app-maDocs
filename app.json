@@ -1,26 +1,27 @@
 {
   "expo": {
-    "name": "app-banco-de-documentos",
-    "slug": "app-banco-de-documentos",
+    "name": "maDocs",
+    "slug": "maDocs",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "appbancodedocumentos",
+    "scheme": "madocs",
     "userInterfaceStyle": "automatic",
+    "icon": "./assets/images/icon-App.png",
     "android": {
+      "package": "com.gustavosamadello.madocs",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE"
+        "foregroundImage": "./assets/images/icon-App.png",
+        "backgroundColor": "#3E5DF9"
       },
       "predictiveBackGestureEnabled": false
-    },
-    "web": {
-      "output": "server"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF"
+          "backgroundColor": "#3E5DF9"
         }
       ],
       "expo-sqlite",
@@ -29,6 +30,16 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "612cd9de-28ef-4c9c-a933-a27c21024afe"
+      }
     }
   }
 }

@@ -64,36 +64,38 @@ export default function TabLayout() {
         className="flex-1 rounded-t-[20px] bg-white"
         contentContainerStyle={{ padding: 20, paddingBottom: 28 }}
         ItemSeparatorComponent={() => <View className="h-3" />}
-        ListHeaderComponent={!query ? (
-          <View className="gap-5 pb-3">
-            <View>
-              <View className="flex flex-row gap-[5px]">
-                <Text className="text-start text-2xl text-azul-primario font-normal">
-                  Bem-vindo ao
+        ListHeaderComponent={
+          !query ? (
+            <View className="gap-5 pb-3">
+              <View>
+                <View className="flex flex-row gap-[5px]">
+                  <Text className="text-start text-2xl text-azul-primario font-normal">
+                    Bem-vindo ao
+                  </Text>
+                  <Logo color="#3E5DF9" />
+                </View>
+                <Text className="text-lg italic font-light">
+                  Acesso rápido de documentos!
                 </Text>
-                <Logo color="#3E5DF9" className="pb-2" />
               </View>
-              <Text className="text-lg italic font-light">
-                Acesso rápido de documentos!
-              </Text>
-            </View>
-            <Menu
-              onAddDocumentPress={() => router.push("/add-docs")}
-              onArchivePress={() => router.push("/my-docs")}
-              onOpenFolders={() => router.push("/folders")}
-              onSettingsPress={() => router.push("/settings")}
-            />
-            <View className="gap-3">
+              <Menu
+                onAddDocumentPress={() => router.push("/add-docs")}
+                onArchivePress={() => router.push("/my-docs")}
+                onOpenFolders={() => router.push("/folders")}
+                onSettingsPress={() => router.push("/settings")}
+              />
+              <View className="gap-3">
+                <Text className="text-lg font-semibold text-azul-primario">
+                  Categorias
+                </Text>
+                <CategoryCarousel categories={categories} />
+              </View>
               <Text className="text-lg font-semibold text-azul-primario">
-                Categorias
+                Acesso Rápido
               </Text>
-              <CategoryCarousel categories={categories} />
             </View>
-            <Text className="text-lg font-semibold text-azul-primario">
-              Acesso Rápido
-            </Text>
-          </View>
-        ) : undefined}
+          ) : undefined
+        }
         renderItem={({ item }) => (
           <DocumentCard
             doc={item}

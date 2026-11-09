@@ -9,7 +9,7 @@ type LogoProps = {
 
 export function Logo({
   width = 120,
-  height = 26.6,
+  height = 26,
   color = "#000000",
   className = "",
 }: LogoProps) {
