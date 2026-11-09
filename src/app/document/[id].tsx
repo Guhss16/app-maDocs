@@ -1,8 +1,10 @@
+import { Star } from "@/assets/images/star";
 import SecondaryView from "@/components/layout/secondary-view";
 import { CATEGORIES } from "@/constants/categories";
 import {
   deleteDocumentById,
   getDocumentById,
+  setDocumentQuickAccess,
   type Document,
 } from "@/data/documents";
 import { openPdf, sharePdf } from "@/data/pdfActions";
@@ -17,6 +19,7 @@ export default function DocumentDetails() {
   const [doc, setDoc] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [savingQuickAccess, setSavingQuickAccess] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -79,6 +82,22 @@ export default function DocumentDetails() {
     }
   }
 
+  async function handleToggleQuickAccess() {
+    if (!doc || savingQuickAccess) return;
+
+    const quickAccess = doc.quick_access !== 1;
+    setSavingQuickAccess(true);
+    try {
+      await setDocumentQuickAccess(doc.id, quickAccess);
+      setDoc({ ...doc, quick_access: quickAccess ? 1 : 0 });
+    } catch (error) {
+      console.error("Erro ao atualizar acesso rápido:", error);
+      Alert.alert("Erro", "Não foi possível atualizar o acesso rápido.");
+    } finally {
+      setSavingQuickAccess(false);
+    }
+  }
+
   function handleDelete() {
     if (!doc) return;
 
@@ -124,9 +143,28 @@ export default function DocumentDetails() {
     <SecondaryView editavel doc={doc} className="flex flex-col">
       <View>
         <Text className="text-md">Documento</Text>
-        <Text className="text-4xl font-semibold text-azul-primario uppercase">
-          {doc.name}
-        </Text>
+        <View className="flex-row items-start justify-between gap-3">
+          <Text className="flex-1 text-4xl font-semibold text-azul-primario uppercase">
+            {doc.name}
+          </Text>
+          <Pressable
+            onPress={handleToggleQuickAccess}
+            disabled={savingQuickAccess}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityState={{
+              checked: doc.quick_access === 1,
+              disabled: savingQuickAccess,
+            }}
+            accessibilityLabel={
+              doc.quick_access === 1
+                ? "Remover do acesso rápido"
+                : "Adicionar ao acesso rápido"
+            }
+          >
+            <Star filled={doc.quick_access === 1} size={28} />
+          </Pressable>
+        </View>
       </View>
 
       <View className="flex flex-row gap-4">

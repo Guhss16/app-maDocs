@@ -1,4 +1,5 @@
 import { Arrow } from "@/assets/images/arrow";
+import { Star } from "@/assets/images/star";
 import SecondaryView from "@/components/layout/secondary-view";
 import { CATEGORIES, type CategoryKey } from "@/constants/categories";
 import { createDocument, listDocuments } from "@/data/documents";
@@ -16,6 +17,7 @@ export default function TabLayout() {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [folderListOpen, setFolderListOpen] = useState(false);
+  const [quickAccess, setQuickAccess] = useState(false);
   const [loadingFolders, setLoadingFolders] = useState(true);
   const [folderLoadError, setFolderLoadError] = useState(false);
   const [folderLoadAttempt, setFolderLoadAttempt] = useState(0);
@@ -82,6 +84,7 @@ export default function TabLayout() {
         pdfUri: pdf.uri,
         documentNumber: number.trim() || undefined,
         folderId: selectedFolderId,
+        quickAccess,
       });
       console.log("4. createDocument terminou");
 
@@ -268,6 +271,22 @@ export default function TabLayout() {
             </Pressable>
           )}
         </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ checked: quickAccess }}
+          accessibilityLabel={
+            quickAccess
+              ? "Remover do acesso rápido"
+              : "Adicionar ao acesso rápido"
+          }
+          onPress={() => setQuickAccess((value) => !value)}
+          className="flex-row items-center gap-3 self-start"
+        >
+          <Star filled={quickAccess} />
+          <Text className="text-base text-azul-primario">
+            {quickAccess ? "No acesso rápido" : "Adicionar ao acesso rápido"}
+          </Text>
+        </Pressable>
         <Pressable
           onPress={handlePickPdf}
           className="bg-[#D9D9D9] h-[20vh] rounded-lg text-xl shadow-sm items-center justify-center"

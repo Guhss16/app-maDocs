@@ -1,4 +1,5 @@
 import { EyeOpen } from "@/assets/images/eye-open";
+import { Star } from "@/assets/images/star";
 import { CATEGORIES } from "@/constants/categories";
 import type { Document } from "@/data/documents";
 import { openPdf } from "@/data/pdfActions";
@@ -8,6 +9,7 @@ import { Alert, Pressable, Text, View } from "react-native";
 type Props = {
   doc: Document;
   onPress: (doc: Document) => void;
+  fullWidth?: boolean;
 };
 
 // "2027-03-15" -> "15/03/2027"
@@ -31,12 +33,14 @@ async function handleOpenDetails(doc: Document) {
   }
 }
 
-export function DocumentCard({ doc, onPress }: Props) {
+export function DocumentCard({ doc, onPress, fullWidth = false }: Props) {
   const category = CATEGORIES[doc.category];
 
   return (
     <Pressable
-      className="flex-row items-center bg-white rounded-xl overflow-hidden shadow-sm pr-4"
+      className={`flex-row items-center bg-white rounded-xl overflow-hidden shadow-sm pr-4 ${
+        fullWidth ? "w-full" : ""
+      }`}
       onPress={() => onPress(doc)}
     >
       <View
@@ -45,9 +49,12 @@ export function DocumentCard({ doc, onPress }: Props) {
       />
 
       <View className="flex-1 p-[14px] gap-0.5">
-        <Text className="text-base font-semibold" numberOfLines={1}>
-          {doc.name}
-        </Text>
+        <View className="flex-row items-center gap-1">
+          <Text className="flex-1 text-base font-semibold" numberOfLines={1}>
+            {doc.name}
+          </Text>
+          {doc.quick_access === 1 && <Star size={16} filled />}
+        </View>
         <Text
           className="text-[13px] font-medium"
           style={{ color: category.color }}

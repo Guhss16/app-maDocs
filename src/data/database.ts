@@ -27,6 +27,11 @@ const MIGRATIONS: string[] = [
 
   CREATE INDEX idx_documents_folder_id
   ON documents(folder_id);`,
+
+  // Migration 3: marcação de acesso rápido
+  `ALTER TABLE documents
+   ADD COLUMN quick_access INTEGER NOT NULL DEFAULT 0
+   CHECK (quick_access IN (0, 1));`,
 ];
 
 // Guarda a instância do banco para o resto do app usar

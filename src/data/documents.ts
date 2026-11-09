@@ -13,6 +13,7 @@ export type Document = {
   file_size: number;
   folder_id: string | null;
   folder_name?: string | null;
+  quick_access: number;
 };
 
 export type NewDocument = {
@@ -22,6 +23,7 @@ export type NewDocument = {
   documentNumber?: string;
   expiresAt?: string;
   folderId?: string | null;
+  quickAccess?: boolean;
 };
 
 export async function createDocument(input: NewDocument) {
@@ -42,9 +44,10 @@ export async function createDocument(input: NewDocument) {
           expires_at,
           file_path,
           file_size,
-          folder_id
+          folder_id,
+          quick_access
         )
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         input.name,
@@ -54,6 +57,7 @@ export async function createDocument(input: NewDocument) {
         file.filePath,
         file.fileSize,
         input.folderId ?? null,
+        input.quickAccess ? 1 : 0,
       ],
     );
   } catch (error) {
@@ -67,6 +71,21 @@ export async function createDocument(input: NewDocument) {
 export async function listDocuments(): Promise<Document[]> {
   return getDb().getAllAsync<Document>(
     "SELECT * FROM documents ORDER BY rowid DESC",
+  );
+}
+
+export async function listQuickAccessDocuments(): Promise<Document[]> {
+  return getDb().getAllAsync<Document>(
+    "SELECT * FROM documents WHERE quick_access = 1 ORDER BY rowid DESC",
+  );
+}
+
+export async function listDocumentsByCategory(
+  category: CategoryKey,
+): Promise<Document[]> {
+  return getDb().getAllAsync<Document>(
+    "SELECT * FROM documents WHERE category = ? ORDER BY rowid DESC",
+    [category],
   );
 }
 
@@ -87,14 +106,21 @@ export async function updateDocumentById(
     category: CategoryKey;
     documentNumber: string | null;
     folderId?: string | null;
+    quickAccess: boolean;
   },
 ): Promise<void> {
   if (input.folderId === undefined) {
     await getDb().runAsync(
       `UPDATE documents
-       SET name = ?, category = ?, document_number = ?
+       SET name = ?, category = ?, document_number = ?, quick_access = ?
        WHERE id = ?`,
-      [input.name, input.category, input.documentNumber, id],
+      [
+        input.name,
+        input.category,
+        input.documentNumber,
+        input.quickAccess ? 1 : 0,
+        id,
+      ],
     );
     return;
   }
@@ -104,15 +130,27 @@ export async function updateDocumentById(
      SET name = ?,
          category = ?,
          document_number = ?,
+         quick_access = ?,
          folder_id = ?
      WHERE id = ?`,
     [
       input.name,
       input.category,
       input.documentNumber,
+      input.quickAccess ? 1 : 0,
       input.folderId ?? null,
       id,
     ],
+  );
+}
+
+export async function setDocumentQuickAccess(
+  id: string,
+  quickAccess: boolean,
+): Promise<void> {
+  await getDb().runAsync(
+    "UPDATE documents SET quick_access = ? WHERE id = ?",
+    [quickAccess ? 1 : 0, id],
   );
 }
 
