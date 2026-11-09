@@ -70,9 +70,8 @@ export default function TabLayout() {
               <View>
                 <View className="flex flex-row gap-[5px]">
                   <Text className="text-start text-2xl text-azul-primario font-normal">
-                    Bem-vindo ao
+                    Bem-vindo ao <Text className="font-bold">maDocs</Text>!
                   </Text>
-                  <Logo color="#3E5DF9" />
                 </View>
                 <Text className="text-lg italic font-light">
                   Acesso rápido de documentos!
